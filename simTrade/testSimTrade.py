@@ -1,14 +1,14 @@
 # some tests for simTrade
-from simTrade import Market
+from simTrade import Exchange
 
-def testMarketConstructor():
-  binance = Market("binance")
+def testExchangeConstructor():
+  binance = Exchange("binance")
   assert (binance is not None), "Binance was not constructed"
   assert (binance.wallet["USD"] == 0), "Binance should have wallet['USD'] == 0"
   assert (binance.name == "binance"), "Binance.name should equal 'binance'"
 
-def testMarketDeposit():
-  binance = Market("binance")
+def testExchangeDeposit():
+  binance = Exchange("binance")
   binance.deposit("USD", 10)
   assert (binance.wallet["USD"] == 10), "Deposit of 10 should raise value to 10"
   binance.deposit("BTC", 5)
@@ -16,8 +16,8 @@ def testMarketDeposit():
   binance.deposit("USD", 1)
   assert (binance.wallet["USD"] == 11), "Multiple deposits should work."
 
-def testMarketTrade():
-  binance = Market("binance")
+def testExchangeTrade():
+  binance = Exchange("binance")
   binance.deposit("USD", 10)
   assert (binance.trade("USD", "USD", 1, 1)), "This is a valid trade."
   assert (binance.wallet["USD"] == 10), "Trade shouldn't have changed value"
@@ -28,15 +28,15 @@ def testMarketTrade():
   assert (binance.trade("BTC", "USD", 1, 1)), "Should be able to trade back."
   assert (binance.wallet["BTC"] == 0), "Should go to zero."
 
-def testMarket(verbose = True):
-  if verbose: print("Testing Market class...")
-  testMarketConstructor()
+def testExchange(verbose = True):
+  if verbose: print("Testing Exchange class...")
+  testExchangeConstructor()
   if verbose: print("Passed Constructor Tests")
-  testMarketDeposit()
+  testExchangeDeposit()
   if verbose: print("Passed Deposit Tests")
-  testMarketTrade()
+  testExchangeTrade()
   if verbose: print("Passed Trade Tests")
   if verbose: print("Passed all tests :)")
 
 if __name__ == "__main__":
-  testMarket()
+  testExchange()

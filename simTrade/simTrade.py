@@ -1,14 +1,14 @@
 # This script could be used to simulate trades within exchanges.
-class Market:
+class Exchange:
   def __init__(self, newName):
-    """This should represent a new exchange market and keep track of
-    the amount of currency held in each market."""
+    """This should represent a new exchange and keep track of
+    the amount of currency held in each individual exchange."""
     self.name = newName
     self.wallet = {"USD": 0}
   def trade(self,fromCurrency, toCurrency, amountGiven, amountRecieved):
     """This function simulates a trade of one currency for another by a given
     amount. Example call that trades one bitcoin for $100 dollars:
-    binance = Market("binance")
+    binance = Exchange("binance")
     if binance.trade("BTC", "USD", 1, 100):
       print("Successfully traded 1 BTC for 100 USD")
     """

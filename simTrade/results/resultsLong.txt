@@ -1,0 +1,36 @@
+Insuffecient funds for trade:
+Attempted: 0.107 Available: 0.06451586999999954
+Order failed
+Insuffecient funds for trade:
+Attempted: 0.107 Available: 0.06451586999999954
+Order failed
+Insuffecient funds for trade:
+Attempted: 0.107 Available: 0.06451586999999954
+Order failed
+Insuffecient funds for trade:
+Attempted: 0.107 Available: 0.06451586999999954
+Order failed
+Insuffecient funds for trade:
+Attempted: 0.107 Available: 0.06451586999999954
+Order failed
+Insuffecient funds for trade:
+Attempted: 0.107 Available: 0.06451586999999954
+Order failed
+After running arbitrage for 20 on the EXMO and GDAX exchanges in the market for BTC/USD the results were as follows:
+Simple profit: 1157.5072744087993
+ Change in amount of currencies:
+   BTC
+     EXMO:-4.935484130000001
+     GDAX:4.935484130000001
+     Total:0.0
+   USD
+     EXMO:53911.700151990284
+     GDAX:-52884.40331758093
+     Total:1027.2968344093533
+
+Starting Totals:
+EXMO {"USD": 500000.0, "BTC": 5}
+GDAX {"USD": 500000.0, "BTC": 5}
+Ending Totals:
+EXMO {"USD": 553911.7001519903, "BTC": 0.06451586999999954}
+GDAX {"USD": 447115.59668241907, "BTC": 9.93548413}

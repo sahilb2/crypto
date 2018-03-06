@@ -21,46 +21,54 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         self.quote_currency = symbol.split("/")[1]
         self.profit = 0
         # Set initial balances in each market
-        default_deposit_amount = 100000
+        default_deposit_amount = 5
+        default_quote_multiplier = 1e5
         self.paper_exchange0.deposit(self.base_currency,\
             default_deposit_amount)
         self.paper_exchange1.deposit(self.base_currency,\
             default_deposit_amount)
         self.paper_exchange0.deposit(self.quote_currency,\
-            default_deposit_amount)
+            default_deposit_amount * default_quote_multiplier)
         self.paper_exchange1.deposit(self.quote_currency,\
-            default_deposit_amount)
+            default_deposit_amount * default_quote_multiplier)
 
     def get_to_buy(self):
         """This method querries the exchanges to find the lowest asking price
         and returns it along with needed trade information."""
         orders0 = self.exchange0.fetch_order_book(self.symbol)
         orders1 = self.exchange1.fetch_order_book(self.symbol)
-        buy0 = orders0["asks"][0]
-        buy1 = orders1["asks"][0]
+        buy0 = orders0["asks"][0] if orders0["asks"] else [0, 0]
+        buy1 = orders1["asks"][0] if orders1["asks"] else [0, 0]
         if buy0[0] == min(buy0[0], buy1[0]):
             low_buy = buy0
             exchange = self.exchange0
         else:
             low_buy = buy1
             exchange = self.exchange1
-        return {"price": low_buy[0], "amount": low_buy[1], "exchange": exchange}
+        return {
+            "price": low_buy[0],
+            "amount": low_buy[1],
+            "exchange": exchange,
+            }
 
     def get_to_sell(self):
         """This method querries the exchanges to find the highest bid price
         and returns it along with needed trade information."""
         orders0 = self.exchange0.fetch_order_book(self.symbol)
         orders1 = self.exchange1.fetch_order_book(self.symbol)
-        sell0 = orders0["bids"][0]
-        sell1 = orders1["bids"][0]
+        sell0 = orders0["bids"][0] if orders0["bids"] else [0, 0]
+        sell1 = orders1["bids"][0] if orders0["bids"] else [0, 0]
         if sell0[0] == max(sell0[0], sell1[0]):
             high_sell = sell0
             exchange = self.exchange0
         else:
             high_sell = sell1
             exchange = self.exchange1
-        return {"price": high_sell[0], "amount": high_sell[1],\
-            "exchange": exchange}
+        return {
+            "price": high_sell[0],
+            "amount": high_sell[1],
+            "exchange": exchange
+            }
 
     def get_order(self):
         """This method combines buy and sell orders into a useful arbitrage
@@ -125,10 +133,22 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
                 fail_count += 1
             if fail_count > 5:
                 break
-            time.sleep(.25)
+            time.sleep(.5)
         else:
             print("Duration complete.")
         self.print_output(starting_balances, duration, True, True)
+        self.reset_balances(starting_balances)
+
+    def reset_balances(self, starting_balances):
+        """This method reset starting balances so simulation can be reran."""
+        self.paper_exchange0.deposit(self.base_currency,\
+            starting_balances[0][self.base_currency])
+        self.paper_exchange0.deposit(self.quote_currency,\
+            starting_balances[0][self.quote_currency])
+        self.paper_exchange1.deposit(self.base_currency,\
+            starting_balances[1][self.base_currency])
+        self.paper_exchange1.deposit(self.quote_currency,\
+            starting_balances[1][self.quote_currency])
 
     def print_output(self, starting_balances, duration, change=False,\
         totals=False):
@@ -174,12 +194,16 @@ if __name__ == "__main__":
     G = ccxt.gdax()
     HIT = ccxt.hitbtc()
     BIT = ccxt.bittrex()
-    SIM = ArbitrageSimulation(BIT, HIT, "BTC/USDT")
-    # SIM = ArbitrageSimulation(E, G, "BTC/USD")
-    if len(sys.argv) == 2:
-        SIM.start_simulation(int(sys.argv[1]))
-    elif len(sys.argv) > 2:
-        for arg in sys.argv[1:]:
+    CHOICES = [
+        ArbitrageSimulation(BIT, HIT, "BTC/USDT"),
+        ArbitrageSimulation(E, G, "BTC/USD"),
+        ]
+    CHOICE = int(sys.argv[1]) if len(sys.argv) > 1 else 0
+    SIM = CHOICES[CHOICE]
+    if len(sys.argv) == 3:
+        SIM.start_simulation(int(sys.argv[2]))
+    elif len(sys.argv) > 3:
+        for arg in sys.argv[2:]:
             SIM.start_simulation(int(arg))
     else:
         SIM.start_simulation(1)

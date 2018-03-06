@@ -1,0 +1,146 @@
+Beginning simulation...
+Ending simulation after 1.0020042578379313 minutes.
+
+After running arbitrage for 1 on the Bittrex and HitBTC exchanges in the market for BTC/USDT the results were as follows:
+
+Simple profit: 189.64408040958614
+
+ Change in amount of currencies:
+   BTC
+     Bittrex:1.3384495899998967
+     HitBTC:-1.3384495899998967
+     Total:0.0
+   USDT
+     Bittrex:-14347.509353131987
+     HitBTC:14537.153433524072
+     Total:189.64408039208502
+
+Starting Totals:
+Bittrex {"USD": 0, "BTC": 50, "USDT": 5000000.0}
+HitBTC {"USD": 0, "BTC": 50, "USDT": 5000000.0}
+Ending Totals:
+Bittrex {"USD": 0, "BTC": 51.3384495899999, "USDT": 4985652.490646868}
+HitBTC {"USD": 0, "BTC": 48.6615504100001, "USDT": 5014537.153433524}
+Beginning simulation...
+Ending simulation after 2.0062872608502706 minutes.
+
+After running arbitrage for 2 on the Bittrex and HitBTC exchanges in the market for BTC/USDT the results were as follows:
+
+Simple profit: 1430.7875815344457
+
+ Change in amount of currencies:
+   BTC
+     Bittrex:7.484555759999978
+     HitBTC:-7.484555759999978
+     Total:0.0
+   USDT
+     Bittrex:-80039.04486268573
+     HitBTC:81280.1883637961
+     Total:1241.143501110375
+
+Starting Totals:
+Bittrex {"USD": 0, "BTC": 101.3384495899999, "USDT": 9985652.490646869}
+HitBTC {"USD": 0, "BTC": 98.6615504100001, "USDT": 10014537.153433524}
+Ending Totals:
+Bittrex {"USD": 0, "BTC": 108.82300534999987, "USDT": 9905613.445784183}
+HitBTC {"USD": 0, "BTC": 91.17699465000013, "USDT": 10095817.34179732}
+Beginning simulation...
+Ending simulation after 3.022651433944702 minutes.
+
+After running arbitrage for 3 on the Bittrex and HitBTC exchanges in the market for BTC/USDT the results were as follows:
+
+Simple profit: 4817.914904919045
+
+ Change in amount of currencies:
+   BTC
+     Bittrex:20.554487679999227
+     HitBTC:-20.554487679999227
+     Total:0.0
+   USDT
+     Bittrex:-220271.3271412067
+     HitBTC:223658.4544645287
+     Total:3387.127323321998
+
+Starting Totals:
+Bittrex {"USD": 0, "BTC": 210.16145493999977, "USDT": 19891265.93643105}
+HitBTC {"USD": 0, "BTC": 189.83854506000023, "USDT": 20110354.495230846}
+Ending Totals:
+Bittrex {"USD": 0, "BTC": 230.715942619999, "USDT": 19670994.609289844}
+HitBTC {"USD": 0, "BTC": 169.284057380001, "USDT": 20334012.949695375}
+Beginning simulation...
+Traceback (most recent call last):
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 387, in _make_request
+    six.raise_from(e, None)
+  File "<string>", line 2, in raise_from
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 383, in _make_request
+    httplib_response = conn.getresponse()
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/http/client.py", line 1331, in getresponse
+    response.begin()
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/http/client.py", line 297, in begin
+    version, status, reason = self._read_status()
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/http/client.py", line 258, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/socket.py", line 586, in readinto
+    return self._sock.recv_into(b)
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/ssl.py", line 1002, in recv_into
+    return self.read(nbytes, buffer)
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/ssl.py", line 865, in read
+    return self._sslobj.read(len, buffer)
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/ssl.py", line 625, in read
+    v = self._sslobj.read(len, buffer)
+socket.timeout: The read operation timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/requests/adapters.py", line 440, in send
+    timeout=timeout
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 639, in urlopen
+    _stacktrace=sys.exc_info()[2])
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/urllib3/util/retry.py", line 357, in increment
+    raise six.reraise(type(error), error, _stacktrace)
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/urllib3/packages/six.py", line 686, in reraise
+    raise value
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 601, in urlopen
+    chunked=chunked)
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 389, in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/urllib3/connectionpool.py", line 309, in _raise_timeout
+    raise ReadTimeoutError(self, url, "Read timed out. (read timeout=%s)" % timeout_value)
+urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='bittrex.com', port=443): Read timed out. (read timeout=10)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/ccxt/base/exchange.py", line 360, in fetch
+    proxies=self.proxies
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/requests/sessions.py", line 508, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/requests/sessions.py", line 618, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/requests/adapters.py", line 521, in send
+    raise ReadTimeout(e, request=request)
+requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='bittrex.com', port=443): Read timed out. (read timeout=10)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "simulation.py", line 215, in <module>
+    SIM.start_simulation(5)
+  File "simulation.py", line 131, in start_simulation
+    if not self.place_paper_order():
+  File "simulation.py", line 85, in place_paper_order
+    order = self.get_order()
+  File "simulation.py", line 77, in get_order
+    sell_info = self.get_to_sell()
+  File "simulation.py", line 57, in get_to_sell
+    orders0 = self.exchange0.fetch_order_book(self.symbol)
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/ccxt/bittrex.py", line 229, in fetch_order_book
+    }, params))
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/ccxt/bittrex.py", line 683, in request
+    response = self.fetch2(path, api, method, params, headers, body)
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/ccxt/base/exchange.py", line 308, in fetch2
+    return self.fetch(request['url'], request['method'], request['headers'], request['body'])
+  File "/home/cpigg2/my-envs/py3/lib/python3.6/site-packages/ccxt/base/exchange.py", line 367, in fetch
+    raise RequestTimeout(' '.join([self.id, method, url, 'request timeout']))
+ccxt.base.errors.RequestTimeout: bittrex GET https://bittrex.com/api/v1.1/public/getorderbook?market=USDT-BTC&type=both request timeout

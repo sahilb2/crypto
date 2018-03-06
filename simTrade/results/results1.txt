@@ -1,110 +1,23 @@
-Duration complete.
-After running arbitrage for 1 on the Bittrex and HitBTC exchanges in the market for BTC/USDT the results were as follows:
-Simple profit: 1646.8868468834976
+Beginning simulation...
+Ending simulation after 10.008550337950389 minutes.
+
+After running arbitrage for 10 on the EXMO and GDAX exchanges in the market for BTC/USD the results were as follows:
+
+Simple profit: 9305.67590811877
+
  Change in amount of currencies:
    BTC
-     Bittrex:7.63710277993232
-     HitBTC:-7.63710277993232
-     Total:0.0
-   USDT
-     Bittrex:-82571.96038672526
-     HitBTC:84218.8472336088
-     Total:1646.8868468835426
+     EXMO:-27.39020457999971
+     GDAX:27.39020457999888
+     Total:-8.313350008393172e-13
+   USD
+     EXMO:300169.8788394332
+     GDAX:-290864.20293140505
+     Total:9305.675908028148
 
 Starting Totals:
-Bittrex {"USD": 0, "BTC": 100000, "USDT": 100000}
-HitBTC {"USD": 0, "BTC": 100000, "USDT": 100000}
+EXMO {"USD": 5000000.0, "BTC": 50}
+GDAX {"USD": 5000000.0, "BTC": 50}
 Ending Totals:
-Bittrex {"USD": 0, "BTC": 100007.63710277993, "USDT": 17428.03961327475}
-HitBTC {"USD": 0, "BTC": 99992.36289722007, "USDT": 184218.8472336088}
-Duration complete.
-After running arbitrage for 2 on the Bittrex and HitBTC exchanges in the market for BTC/USDT the results were as follows:
-Simple profit: 3443.254893124993
- Change in amount of currencies:
-   BTC
-     Bittrex:9.990585159888724
-     HitBTC:-9.990585159888724
-     Total:0.0
-   USDT
-     Bittrex:-108394.85440090936
-     HitBTC:110191.2224471508
-     Total:1796.368046241434
-
-Starting Totals:
-Bittrex {"USD": 0, "BTC": 200007.63710277993, "USDT": 117428.03961327474}
-HitBTC {"USD": 0, "BTC": 199992.36289722007, "USDT": 284218.84723360883}
-Ending Totals:
-Bittrex {"USD": 0, "BTC": 200017.62768793982, "USDT": 9033.185212365379}
-HitBTC {"USD": 0, "BTC": 199982.37231206018, "USDT": 394410.0696807596}
-Insuffecient funds for trade:
-Attempted: 759.5000000000001 Available: 142.9529997902863
-Order failed
-Insuffecient funds for trade:
-Attempted: 1844.5000000000002 Available: 34.4529997902863
-Order failed
-Insuffecient funds for trade:
-Attempted: 1844.5000000000002 Available: 34.4529997902863
-Order failed
-Insuffecient funds for trade:
-Attempted: 6018.9295425 Available: 34.4529997902863
-Order failed
-Insuffecient funds for trade:
-Attempted: 6018.9295425 Available: 34.4529997902863
-Order failed
-Insuffecient funds for trade:
-Attempted: 6018.9295425 Available: 34.4529997902863
-Order failed
-After running arbitrage for 3 on the Bittrex and HitBTC exchanges in the market for BTC/USDT the results were as follows:
-Simple profit: 5976.694874928486
- Change in amount of currencies:
-   BTC
-     Bittrex:11.652326650219038
-     HitBTC:-13.72654680017149
-     Total:-2.0742201499524526
-   USDT
-     Bittrex:-126426.77182584984
-     HitBTC:151465.5004351535
-     Total:25038.728609303653
-
-Starting Totals:
-Bittrex {"USD": 0, "BTC": 400025.2647907197, "USDT": 126461.22482564012}
-HitBTC {"USD": 0, "BTC": 399974.7352092803, "USDT": 678628.9169143685}
-Ending Totals:
-Bittrex {"USD": 0, "BTC": 400036.91711736994, "USDT": 34.4529997902863}
-HitBTC {"USD": 0, "BTC": 399961.0086624801, "USDT": 830094.417349522}
-Insuffecient funds for trade:
-Attempted: 1193.28 Available: 176.94740209463043
-Order failed
-Insuffecient funds for trade:
-Attempted: 1193.28 Available: 176.94740209463043
-Order failed
-Insuffecient funds for trade:
-Attempted: 1193.28 Available: 176.94740209463043
-Order failed
-Insuffecient funds for trade:
-Attempted: 1193.28 Available: 176.94740209463043
-Order failed
-Insuffecient funds for trade:
-Attempted: 1193.28 Available: 176.94740209463043
-Order failed
-Insuffecient funds for trade:
-Attempted: 1193.28 Available: 176.94740209463043
-Order failed
-After running arbitrage for 5 on the Bittrex and HitBTC exchanges in the market for BTC/USDT the results were as follows:
-Simple profit: 8301.269334222141
- Change in amount of currencies:
-   BTC
-     Bittrex:11.643220288329758
-     HitBTC:-12.303220288245939
-     Total:-0.659999999916181
-   USDT
-     Bittrex:-126318.73042333577
-     HitBTC:135802.9848826283
-     Total:9484.25445929254
-
-Starting Totals:
-Bittrex {"USD": 0, "BTC": 800062.1819080897, "USDT": 126495.67782543041}
-HitBTC {"USD": 0, "BTC": 799935.7438717603, "USDT": 1508723.3342638905}
-Ending Totals:
-Bittrex {"USD": 0, "BTC": 800073.825128378, "USDT": 176.94740209463043}
-HitBTC {"USD": 0, "BTC": 799923.4406514721, "USDT": 1644526.3191465188}
+EXMO {"USD": 5300169.878839433, "BTC": 22.60979542000029}
+GDAX {"USD": 4709135.797068595, "BTC": 77.39020457999888}

@@ -21,7 +21,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         self.quote_currency = symbol.split("/")[1]
         self.profit = 0
         # Set initial balances in each market
-        default_deposit_amount = 5
+        default_deposit_amount = 50
         default_quote_multiplier = 1e5
         self.paper_exchange0.deposit(self.base_currency,\
             default_deposit_amount)
@@ -126,6 +126,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         self.exchange0.load_markets()
         self.exchange1.load_markets()
         fail_count = 0
+        print("Beginning simulation...")
         while (time.time() - start_time) < duration * 60:
             if not self.place_paper_order():
                 # paper order did not work so maybe stop trading
@@ -134,8 +135,10 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             if fail_count > 5:
                 break
             time.sleep(.5)
-        else:
-            print("Duration complete.")
+        print("Ending simulation after " + str((time.time() - start_time)/60)\
+            + " minutes.")
+        time.sleep(.5)
+        print()
         self.print_output(starting_balances, duration, True, True)
         self.reset_balances(starting_balances)
 
@@ -157,7 +160,9 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             + self.exchange0.name + " and " + self.exchange1.name\
             + " exchanges in the market for " + self.symbol\
             + " the results were as follows:")
+        print()
         print("Simple profit: " + str(self.profit))
+        print()
         d_base0 = self.paper_exchange0.wallet[self.base_currency]\
             - starting_balances[0][self.base_currency]
         d_quote0 = self.paper_exchange0.wallet[self.quote_currency]\
@@ -190,13 +195,11 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
                 + json.dumps(self.paper_exchange1.wallet))
 
 if __name__ == "__main__":
-    E = ccxt.exmo()
-    G = ccxt.gdax()
-    HIT = ccxt.hitbtc()
-    BIT = ccxt.bittrex()
     CHOICES = [
-        ArbitrageSimulation(BIT, HIT, "BTC/USDT"),
-        ArbitrageSimulation(E, G, "BTC/USD"),
+        ArbitrageSimulation(ccxt.bittrex(), ccxt.hitbtc(), "BTC/USDT"),
+        ArbitrageSimulation(ccxt.exmo(), ccxt.gdax(), "BTC/USD"),
+        ArbitrageSimulation(ccxt.exmo(), ccxt.kraken(), "BTC/EUR"),
+        ArbitrageSimulation(ccxt.bitfinex(), ccxt.exmo(), "ETH/USD"),
         ]
     CHOICE = int(sys.argv[1]) if len(sys.argv) > 1 else 0
     SIM = CHOICES[CHOICE]

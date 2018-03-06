@@ -13,6 +13,7 @@ class Exchange:
       print("Successfully traded 1 BTC for 100 USD")
     """
     if fromCurrency not in self.wallet.keys():
+      print("From currency not in wallet.")
       return False
     if toCurrency not in self.wallet:
       self.wallet[toCurrency] = 0
@@ -21,6 +22,9 @@ class Exchange:
       self.wallet[toCurrency] += amountRecieved
       return True
     else:
+      print("Insuffecient funds for trade:")
+      print("Attempted: " + str(amountGiven) + " Available: "\
+          + str(self.wallet[fromCurrency]))
       return False
   def deposit(self, currency, amount):
     """This function allow for deposits into the wallet such that money can

@@ -1,0 +1,34 @@
+Insuffecient funds for trade:
+Attempted: 885.152741460432 Available: 550.5051751172057
+Order failed
+Insuffecient funds for trade:
+Attempted: 14.35106333762975 Available: 5.164768287275471
+Order failed
+Insuffecient funds for trade:
+Attempted: 14.35106333762975 Available: 5.164768287275471
+Order failed
+Insuffecient funds for trade:
+Attempted: 14.35106333762975 Available: 5.164768287275471
+Order failed
+Insuffecient funds for trade:
+Attempted: 14.35106333762975 Available: 5.164768287275471
+Order failed
+Duration complete.
+After running arbitrage for 3 on the EXMO and HitBTC exchanges in the market for BTC/USDT the results were as follows:
+Simple profit: 247.89435684192233
+ Change in amount of currencies:
+   BTC
+     EXMO:0.8828161399815144
+     HitBTC:-0.9660696099799679
+     Total:-0.08325346999845351
+   USDT
+     EXMO:-9994.835231712725
+     HitBTC:11185.286583365603
+     Total:1190.4513516528787
+
+Starting Totals:
+EXMO {"USD": 0, "BTC": 10000, "USDT": 10000}
+HitBTC {"USD": 0, "BTC": 10000, "USDT": 10000}
+Ending Totals:
+EXMO {"USD": 0, "BTC": 10000.882816139982, "USDT": 5.164768287275471}
+HitBTC {"USD": 0, "BTC": 9999.03393039002, "USDT": 21185.286583365603}

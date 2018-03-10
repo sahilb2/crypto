@@ -1,0 +1,23 @@
+Beginning simulation...
+Ending simulation after 10.008550337950389 minutes.
+
+After running arbitrage for 10 on the EXMO and GDAX exchanges in the market for BTC/USD the results were as follows:
+
+Simple profit: 9305.67590811877
+
+ Change in amount of currencies:
+   BTC
+     EXMO:-27.39020457999971
+     GDAX:27.39020457999888
+     Total:-8.313350008393172e-13
+   USD
+     EXMO:300169.8788394332
+     GDAX:-290864.20293140505
+     Total:9305.675908028148
+
+Starting Totals:
+EXMO {"USD": 5000000.0, "BTC": 50}
+GDAX {"USD": 5000000.0, "BTC": 50}
+Ending Totals:
+EXMO {"USD": 5300169.878839433, "BTC": 22.60979542000029}
+GDAX {"USD": 4709135.797068595, "BTC": 77.39020457999888}

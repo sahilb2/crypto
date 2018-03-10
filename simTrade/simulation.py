@@ -128,13 +128,16 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         fail_count = 0
         print("Beginning simulation...")
         while (time.time() - start_time) < duration * 60:
-            if not self.place_paper_order():
-                # paper order did not work so maybe stop trading
-                print("Order failed")
-                fail_count += 1
+            try:
+                if not self.place_paper_order():
+                    # paper order did not work so maybe stop trading
+                    print("Order failed")
+                    fail_count += 1
+                time.sleep(.5)
+            except: # pylint: disable=bare-except
+                time.sleep(10)
             if fail_count > 5:
                 break
-            time.sleep(.5)
         print("Ending simulation after " + str((time.time() - start_time)/60)\
             + " minutes.")
         time.sleep(.5)

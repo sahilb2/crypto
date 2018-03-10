@@ -1,23 +1,92 @@
 Beginning simulation...
-Ending simulation after 10.008550337950389 minutes.
+Ending simulation after 1.0123130997021994 minutes.
 
-After running arbitrage for 10 on the EXMO and GDAX exchanges in the market for BTC/USD the results were as follows:
+After running arbitrage for 1 on the Bittrex and HitBTC exchanges in the market for BTC/USDT the results were as follows:
 
-Simple profit: 9305.67590811877
+Simple profit: 510.59434366119905
 
  Change in amount of currencies:
    BTC
-     EXMO:-27.39020457999971
-     GDAX:27.39020457999888
-     Total:-8.313350008393172e-13
-   USD
-     EXMO:300169.8788394332
-     GDAX:-290864.20293140505
-     Total:9305.675908028148
+     Bittrex:2.7660660099999177
+     HitBTC:-2.7660660099999177
+     Total:0.0
+   USDT
+     Bittrex:-25169.30755599495
+     HitBTC:25679.901899650693
+     Total:510.5943436557427
 
 Starting Totals:
-EXMO {"USD": 5000000.0, "BTC": 50}
-GDAX {"USD": 5000000.0, "BTC": 50}
+Bittrex {"USD": 0, "BTC": 50, "USDT": 5000000.0}
+HitBTC {"USD": 0, "BTC": 50, "USDT": 5000000.0}
 Ending Totals:
-EXMO {"USD": 5300169.878839433, "BTC": 22.60979542000029}
-GDAX {"USD": 4709135.797068595, "BTC": 77.39020457999888}
+Bittrex {"USD": 0, "BTC": 52.76606600999992, "USDT": 4974830.692444005}
+HitBTC {"USD": 0, "BTC": 47.23393399000008, "USDT": 5025679.901899651}
+Beginning simulation...
+Ending simulation after 2.0019407232602435 minutes.
+
+After running arbitrage for 2 on the Bittrex and HitBTC exchanges in the market for BTC/USDT the results were as follows:
+
+Simple profit: 4849.775197671838
+
+ Change in amount of currencies:
+   BTC
+     Bittrex:22.46217902999996
+     HitBTC:-22.46217902999996
+     Total:0.0
+   USDT
+     Bittrex:-204354.82550925575
+     HitBTC:208694.00636328943
+     Total:4339.180854033679
+
+Starting Totals:
+Bittrex {"USD": 0, "BTC": 102.76606600999992, "USDT": 9974830.692444004}
+HitBTC {"USD": 0, "BTC": 97.23393399000008, "USDT": 10025679.90189965}
+Ending Totals:
+Bittrex {"USD": 0, "BTC": 125.22824503999988, "USDT": 9770475.866934748}
+HitBTC {"USD": 0, "BTC": 74.77175496000012, "USDT": 10234373.90826294}
+Beginning simulation...
+Ending simulation after 3.0095126271247863 minutes.
+
+After running arbitrage for 3 on the Bittrex and HitBTC exchanges in the market for BTC/USDT the results were as follows:
+
+Simple profit: 7080.641070627112
+
+ Change in amount of currencies:
+   BTC
+     Bittrex:13.966668509999607
+     HitBTC:-13.966668509999607
+     Total:0.0
+   USDT
+     Bittrex:-127514.65790263563
+     HitBTC:129745.523775585
+     Total:2230.865872949362
+
+Starting Totals:
+Bittrex {"USD": 0, "BTC": 227.9943110499998, "USDT": 19745306.55937875}
+HitBTC {"USD": 0, "BTC": 172.0056889500002, "USDT": 20260053.81016259}
+Ending Totals:
+Bittrex {"USD": 0, "BTC": 241.9609795599994, "USDT": 19617791.901476115}
+HitBTC {"USD": 0, "BTC": 158.0390204400006, "USDT": 20389799.333938174}
+Beginning simulation...
+Ending simulation after 5.013526590665181 minutes.
+
+After running arbitrage for 5 on the Bittrex and HitBTC exchanges in the market for BTC/USDT the results were as follows:
+
+Simple profit: 16704.698533280833
+
+ Change in amount of currencies:
+   BTC
+     Bittrex:48.4023037300002
+     HitBTC:-48.4023037300002
+     Total:0.0
+   USDT
+     Bittrex:-441138.8519619182
+     HitBTC:450762.90942462534
+     Total:9624.057462707162
+
+Starting Totals:
+Bittrex {"USD": 0, "BTC": 469.9552906099992, "USDT": 39363098.460854866}
+HitBTC {"USD": 0, "BTC": 330.0447093900008, "USDT": 40649853.14410076}
+Ending Totals:
+Bittrex {"USD": 0, "BTC": 518.3575943399994, "USDT": 38921959.60889295}
+HitBTC {"USD": 0, "BTC": 281.6424056600006, "USDT": 41100616.05352539}

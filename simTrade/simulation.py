@@ -116,6 +116,36 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
 
         return buy_succeeded
 
+    def time_money_making(self, amount, timeout=60):
+        """Time how long it takes to make a certain amount of profit on two
+        particular exchanges with a particular currency pair."""
+        start_time = time.time()
+        starting_balances = [
+            self.paper_exchange0.wallet.copy(),
+            self.paper_exchange1.wallet.copy(),
+            ]
+        self.exchange0.load_markets()
+        self.exchange1.load_markets()
+        fail_count = 0
+        while self.profit < amount and time.time() - start_time < timeout * 60:
+            try:
+                if not self.place_paper_order():
+                    # paper order did not work so maybe stop trading
+                    print("Order failed")
+                    fail_count += 1
+                time.sleep(.5)
+# a bare except makes <C-c> not work. To end early must exit or kill the process
+            except: # pylint: disable=bare-except
+                time.sleep(10)
+            if fail_count > 5:
+                break
+        duration = (time.time() - start_time) / 60
+        if self.profit < amount:
+            print("The simulation ended before achieving a profit of " + amount)
+        print()
+        self.print_output(starting_balances, duration, True, False)
+        self.reset_balances(starting_balances)
+
     def start_simulation(self, duration=2):
         """This method simulates arbitrage trading printing the output."""
         start_time = time.time()
@@ -134,6 +164,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
                     print("Order failed")
                     fail_count += 1
                 time.sleep(.5)
+# a bare except makes <C-c> not work. To end early must exit or kill the process
             except: # pylint: disable=bare-except
                 time.sleep(10)
             if fail_count > 5:
@@ -159,10 +190,10 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
     def print_output(self, starting_balances, duration, change=False,\
         totals=False):
         """This method prints out the results of the simulation."""
-        print("After running arbitrage for " + str(duration) + " on the "\
-            + self.exchange0.name + " and " + self.exchange1.name\
-            + " exchanges in the market for " + self.symbol\
-            + " the results were as follows:")
+        print("After running arbitrage for " + str(duration) + " minutes"\
+            + " on the " + self.exchange0.name + " and "\
+            + self.exchange1.name + " exchanges in the market for "\
+            + self.symbol + " the results were as follows:")
         print()
         print("Simple profit: " + str(self.profit))
         print()
@@ -204,15 +235,67 @@ if __name__ == "__main__":
         ArbitrageSimulation(ccxt.exmo(), ccxt.kraken(), "BTC/EUR"),
         ArbitrageSimulation(ccxt.bitfinex(), ccxt.exmo(), "ETH/USD"),
         ]
-    CHOICE = int(sys.argv[1]) if len(sys.argv) > 1 else 0
-    SIM = CHOICES[CHOICE]
-    if len(sys.argv) == 3:
-        SIM.start_simulation(int(sys.argv[2]))
-    elif len(sys.argv) > 3:
-        for arg in sys.argv[2:]:
-            SIM.start_simulation(int(arg))
-    else:
-        SIM.start_simulation(1)
-        SIM.start_simulation(2)
-        SIM.start_simulation(3)
-        SIM.start_simulation(5)
+    if len(sys.argv) > 1: # can provide commandline args to run simulation
+        CHOICE = int(sys.argv[1]) # first argument is which default sim to use
+        SIM = CHOICES[CHOICE]
+        TYPE1 = [
+            "--duration",
+            "-d",
+            "--length",
+            "-l",
+            "-D",
+            "--durations",
+            ]
+        TYPE2 = [
+            "--amount",
+            "-a",
+            "-A",
+            "--amounts",
+            ]
+        if len(sys.argv) >= 4: # additional arguments are durations to run
+            if sys.argv[2] in TYPE1:
+                for arg in sys.argv[3:]:
+                    SIM.start_simulation(int(arg))
+            elif sys.argv[2] in TYPE2:
+                for arg in sys.argv[3:]:
+                    SIM.time_money_making(int(arg))
+        else: # if no duration provided run a series of durations
+            SIM.start_simulation(1)
+            SIM.start_simulation(2)
+            SIM.start_simulation(3)
+            SIM.start_simulation(5)
+    else: # if no command line arguments are given, prompt user
+        print("You provided no input arguments. What would you like to run?")
+        print("1) A simulation for a given duration")
+        print("2) A simulation until a certain profit is made")
+        SIMULATION_TYPE = input("Please enter the number of your choice: ")
+        while SIMULATION_TYPE != "1" and SIMULATION_TYPE != "2":
+            print("That was not a valid choice.")
+            SIMULATION_TYPE = input("Please enter the number of your choice: ")
+        print("Next choose which preset simulation."\
+                + "Feel free to add to this list.")
+        CHOICE = int(input("Please choose from 0 to " + str(len(CHOICES))\
+                + ": "))
+        while CHOICE < 0 or CHOICE > len(CHOICES):
+            CHOICE = int(input("Please choose from 0 to " + str(len(CHOICES))\
+                    + ": "))
+        SIM = CHOICES[CHOICE]
+        if SIMULATION_TYPE == "1":
+            print("Next choose a duration for simulation.")
+            TIME = float(input("Enter a number of minutes > zero: "))
+            while TIME < 0:
+                print("No negative times please.")
+                TIME = float(input("Enter a number of minutes > zero: "))
+            print("Done building simulation.")
+            print("Starting simulation. This may take a while...")
+            print("I use 'nohup' and '&' on linux when running the simulation.")
+            SIM.start_simulation(TIME)
+        elif SIMULATION_TYPE == "2":
+            print("Next choose target amount.")
+            AMOUNT = float(input("Enter an amount of profit > zero: "))
+            while AMOUNT < 0:
+                print("No negative amounts please.")
+                AMOUNT = float(input("Enter an amount of profit > zero: "))
+            SIM.time_money_making(AMOUNT)
+        else:
+            print("This shouldn't happen. Simulation type is not working.")

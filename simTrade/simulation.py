@@ -127,12 +127,15 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         self.exchange0.load_markets()
         self.exchange1.load_markets()
         fail_count = 0
+        trade_count = 0
         while self.profit < amount and time.time() - start_time < timeout * 60:
             try:
                 if not self.place_paper_order():
                     # paper order did not work so maybe stop trading
                     print("Order failed")
                     fail_count += 1
+                else:
+                    trade_count += 1
                 time.sleep(.5)
 # a bare except makes <C-c> not work. To end early must exit or kill the process
             except: # pylint: disable=bare-except
@@ -143,7 +146,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         if self.profit < amount:
             print("The simulation ended before achieving a profit of " + amount)
         print()
-        self.print_output(starting_balances, duration, True, False)
+        self.print_output(starting_balances, duration, trade_count)
         self.reset_balances(starting_balances)
 
     def start_simulation(self, duration=2):
@@ -156,6 +159,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         self.exchange0.load_markets()
         self.exchange1.load_markets()
         fail_count = 0
+        trade_count = 0
         print("Beginning simulation...")
         while (time.time() - start_time) < duration * 60:
             try:
@@ -163,6 +167,8 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
                     # paper order did not work so maybe stop trading
                     print("Order failed")
                     fail_count += 1
+                else:
+                    trade_count += 1
                 time.sleep(.5)
 # a bare except makes <C-c> not work. To end early must exit or kill the process
             except: # pylint: disable=bare-except
@@ -173,7 +179,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             + " minutes.")
         time.sleep(.5)
         print()
-        self.print_output(starting_balances, duration, True, True)
+        self.print_output(starting_balances, duration, trade_count)
         self.reset_balances(starting_balances)
 
     def reset_balances(self, starting_balances):
@@ -187,8 +193,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         self.paper_exchange1.deposit(self.quote_currency,\
             starting_balances[1][self.quote_currency])
 
-    def print_output(self, starting_balances, duration, change=False,\
-        totals=False):
+    def print_output(self, starting_balances, duration, trade_count):
         """This method prints out the results of the simulation."""
         print("After running arbitrage for " + str(duration) + " minutes"\
             + " on the " + self.exchange0.name + " and "\
@@ -197,6 +202,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         print()
         print("Simple profit: " + str(self.profit))
         print()
+        print("Number of trades: " + str(trade_count))
         d_base0 = self.paper_exchange0.wallet[self.base_currency]\
             - starting_balances[0][self.base_currency]
         d_quote0 = self.paper_exchange0.wallet[self.quote_currency]\
@@ -207,7 +213,8 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             - starting_balances[1][self.quote_currency]
         d_base = d_base0 + d_base1
         d_quote = d_quote0 + d_quote1
-        if change:
+        print_change = True
+        if print_change:
             print(" Change in amount of currencies:")
             print("   " + self.base_currency)
             print("     " + self.exchange0.name + ":" + str(d_base0))
@@ -218,7 +225,8 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             print("     " + self.exchange1.name + ":" + str(d_quote1))
             print("     Total:" + str(d_quote))
             print()
-        if totals:
+        print_totals = True
+        if print_totals:
             print("Starting Totals:")
             print(self.exchange0.name + " " + json.dumps(starting_balances[0]))
             print(self.exchange1.name + " " + json.dumps(starting_balances[1]))

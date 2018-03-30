@@ -4,7 +4,6 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from . import exchange
 
-
 def index(request):
 	button = "<button class=""button"">Submit</button>"
 	input_curr = "Currency: <input type=""text"" name=""currency"">"
@@ -12,7 +11,6 @@ def index(request):
 	body = "<body>" + "<form>" + input_curr + "<br>" + input_amount + "<br>" + button + "</form>" + "</body>"
 	response = "<!DOCTYPE html><html><title></title><head><h1>Cryptocurrency Exchange Simulation</h1></head>" + body + "</html>"
 	return HttpResponse(response)
-
 
 def exchange_currency(request):
 	currency = "USD"

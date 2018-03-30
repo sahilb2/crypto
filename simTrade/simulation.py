@@ -307,6 +307,26 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             print(self.exchange1.name + " "\
                 + json.dumps(self.paper_exchange1.wallet))
 
+    def create_trade_visuals(self):
+        """Create visualizations for the trading that occured."""
+        plt.hist(self.profit)
+        plt.suptitle("Histogram of profit per trade.")
+        plt.ylabel("Number of trades")
+        plt.xlabel("Profit on trade (" + self.quote_currency + ")")
+        plt.savefig("output_hist.png")
+        plt.clf()
+        profit_cumulative = []
+        profit_cumulative.append(self.profit[0])
+        for i in range(1, len(self.profit)):
+            profit_cumulative.append(self.profit[i]\
+                    + profit_cumulative[i - 1])
+        plt.plot(range(len(profit_cumulative)), profit_cumulative)
+        plt.suptitle("Cumulative Profit over Time")
+        plt.ylabel("Cumulative Profit (" + self.quote_currency + ")")
+        plt.xlabel("Time (number of trades since start)")
+        plt.savefig("output_profit.png")
+        plt.clf()
+
 if __name__ == "__main__":
     CHOICES = [
         ArbitrageSimulation(ccxt.bittrex(), ccxt.hitbtc(), "BTC/USDT"),
@@ -341,8 +361,8 @@ if __name__ == "__main__":
             SIM.start_simulation(AMOUNT, include_fees=USE_FEES)
         elif TYPE == 1:
             SIM.time_money_making(AMOUNT, include_fees=USE_FEES)
-        #   if VISUALS:
-# TODO: incorporate visuals
+        if VISUALS:
+            SIM.create_trade_visuals()
 
     else: # if no command line arguments are given, prompt user
         print("You provided no input arguments. What would you like to run?")

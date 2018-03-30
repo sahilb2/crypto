@@ -1,4 +1,4 @@
-runtime: python
+runtime: python3
 env: flex
 api_version: 1
 threadsafe: true

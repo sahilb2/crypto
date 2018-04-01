@@ -1,2 +1,3 @@
-Django==1.4.2
+Django==2.0.3
 ccxt
+psycopg2==2.7.4

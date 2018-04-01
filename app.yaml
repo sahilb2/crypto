@@ -1,4 +1,4 @@
-runtime: python3
+runtime: python
 env: flex
 api_version: 1
 threadsafe: true
@@ -13,4 +13,16 @@ handlers:
 
 - url: /
   static_dir: website
+liveness_check:
+   check_interval_sec: 120
+   timeout_sec: 40
+   failure_threshold: 5
+   success_threshold: 5
+   initial_delay_sec: 500
 
+readiness_check:
+  check_interval_sec: 120
+  timeout_sec: 40
+  failure_threshold: 5
+  success_threshold: 5
+  app_start_timeout_sec: 1500

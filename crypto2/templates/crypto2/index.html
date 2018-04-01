@@ -8,10 +8,11 @@
 		</h1>
 	</head>
 	<body>
-		<form>
+		<form action="" method="post">
+			{% csrf_token %}
 			Currency: <input type="text" name="currency"><br>
 			Amount: <input type="text" name="amount"><br>
-  			<button class="button">Submit</button> 
+  			<input type="submit" value="Submit" /> 
 		</form>
 	</body>
 </html>

@@ -18,8 +18,6 @@ def index(request):
 	return HttpResponse(template.render(context, request))
 
 def exchange_currency(request, currency, amount):
-	currency = "USD"
-	amount = 10
 	binance = exchange.Exchange("binance")
 	binance.deposit(currency, amount)
 	

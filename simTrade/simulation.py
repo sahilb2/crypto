@@ -140,6 +140,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             buy_fee, sell_fee = self.calculate_transaction_fees(order)
         self.profit.append((order["sell"]["price"]\
             - order["buy"]["price"]) * order["buy"]["amount"])
+        # print("Made trade for " + self.profit[len(self.profit)] + " profit")
         if order["sell"]["price"] - order["buy"]["price"] <= 0:
             # not a profitable order
             print("Sell at " + str(order["sell"]["price"]) + " Buy at "\
@@ -270,6 +271,8 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         print()
         print("Number of trades: " + str(trade_count))
         print()
+        print("Number of transactions: " + str(len(self.profit)))
+        print()
         print("Total amount paid in fees: " + str(Fee.total_fees))
         print()
         d_base0 = self.paper_exchange0.wallet[self.base_currency]\
@@ -380,7 +383,7 @@ if __name__ == "__main__":
             CHOICE = int(input("Please choose from 0 to " + str(len(CHOICES))\
                     + ": "))
         SIM = CHOICES[CHOICE]
-        print("Would you like to use the new (unvalidated) fees option?")
+        print("Would you like to use the new fees option?")
         print("1) yes")
         print("2) no")
         USE_FEES = int(input("Please choose 1 or 2: "))
@@ -394,9 +397,8 @@ if __name__ == "__main__":
                 print("No negative times please.")
                 TIME = float(input("Enter a number of minutes > zero: "))
             print("Done building simulation.")
-            print("Starting simulation. This may take a while...")
-            print("I use 'nohup' and '&' on linux to"\
-                    + " run the simulation in the background.")
+            # print("I use 'nohup' and '&' on linux to"\
+            #        + " run the simulation in the background.")
             SIM.start_simulation(TIME, include_fees=USE_FEES)
         elif SIMULATION_TYPE == "2":
             print("Next choose target amount.")
@@ -407,3 +409,10 @@ if __name__ == "__main__":
             SIM.time_money_making(AMOUNT, include_fees=USE_FEES)
         else:
             print("This shouldn't happen. Simulation type is not working.")
+        print("Would you like to make some visuals of the trades?")
+        VISUALS = int(input("1 for visuals, 0 for no visuals: "))
+        if VISUALS == 1:
+            SIM.create_trade_visuals()
+            print("Your visuals can be found in the output images.")
+        else:
+            print("Done")

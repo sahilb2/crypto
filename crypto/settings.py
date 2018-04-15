@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #'crypto2'
 ]
 
 MIDDLEWARE = [
@@ -54,7 +55,7 @@ ROOT_URLCONF = 'crypto.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'crypto2/templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'crypto2/templates/crypto2')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -73,17 +74,31 @@ WSGI_APPLICATION = 'crypto.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
+
+# [START dbconfig]
 DATABASES = {
-    'default': {
+	'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
 
+# In the flexible environment, you connect to CloudSQL using a unix socket.
+# Locally, you can use the CloudSQL proxy to proxy a localhost connection
+# to the instance
+DATABASES['default']['HOST'] = '/cloudsql/cryptoproject-197619:us-central1:cryptodb'
+if os.getenv('GAE_INSTANCE'):
+    pass
+else:
+    DATABASES['default']['HOST'] = '127.0.0.1'
+# [END dbconfig]
+
+
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 
+"""
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -98,7 +113,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+"""
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
@@ -118,3 +133,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'static/'

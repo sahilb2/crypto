@@ -8,12 +8,14 @@ def make_trade(revenue, cost):
     return revenue - cost
     # print("making trade...")
 
+
 def get_buy_price(exchange0, exchange1, symbol):
     """Find lowest price to buy from."""
     buy0 = exchange0.fetch_order_book(symbol)["asks"][0][0]
     buy1 = exchange1.fetch_order_book(symbol)["asks"][0][0]
     low_buy = min(buy0, buy1)
     return low_buy
+
 
 def get_sell_price(exchange0, exchange1, symbol):
     """Find highest price to sell for."""
@@ -22,15 +24,16 @@ def get_sell_price(exchange0, exchange1, symbol):
     high_sell = max(sell0, sell1)
     return high_sell
 
+
 def simple_simulate(exchange0=ccxt.exmo(), exchange1=ccxt.hitbtc(),\
-    symbol="BTC/USDT", duration=5):
+    symbol="BTC/USDT", duration=5.0):
     """Run the simple simulation."""
     start_time = time.time()
     rate_limit = max(exchange0.rateLimit, exchange1.rateLimit)
     exchange0.load_markets()
     exchange1.load_markets()
-    profits = 0
-    while (time.time() - start_time) < duration * 60:
+    profits = 0.0
+    while (time.time() - start_time) < duration * 60.0:
         cost = get_buy_price(exchange0, exchange1, symbol)
         revenue = get_sell_price(exchange0, exchange1, symbol)
         profits += make_trade(revenue, cost)
@@ -40,6 +43,7 @@ def simple_simulate(exchange0=ccxt.exmo(), exchange1=ccxt.hitbtc(),\
         + str(duration) + " minutes were:")
     print(profits)
     return profits
+
 
 if __name__ == "__main__":
     simple_simulate(duration=.25)

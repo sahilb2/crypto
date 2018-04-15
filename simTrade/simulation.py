@@ -5,9 +5,11 @@ import sys
 import json
 import ccxt
 from exchange import Exchange
+from fees import Fee
 
 class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
-    """This class can be used to create simulations for arbitrage crypto trading.
+    """This class can be used to create simulations for arbitrage crypto
+    trading.
     TODO: example usage
     """
     def __init__(self, exchange0, exchange1, symbol):
@@ -80,9 +82,57 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         sell_info["amount"] = amount
         return {"buy": buy_info, "sell": sell_info}
 
-    def place_paper_order(self):
-        """This method uses combined order information to make paper trades."""
+    def calculate_transaction_fees(self, order):
+        """This method uses order info to calculate the fees on trades and
+        apply those fees to profit and exchange balances."""
+# Not confident I'm implementing the fee correctly on the paper trade but
+# simple profit should be correct. I assumed all fees were paid in quote
+# currency.
+        buy_fee, sell_fee = Fee.make_transaction_fees(order)
+        fees = buy_fee.fee + sell_fee.fee
+        self.profit -= fees
+        if buy_fee.exchange.name == self.exchange0.name:
+            self.paper_exchange0.trade(self.quote_currency,\
+              self.base_currency, buy_fee.fee, 0)
+        else:
+            self.paper_exchange1.trade(self.quote_currency,\
+              self.base_currency, buy_fee.fee, 0)
+        if sell_fee.exchange.name == self.exchange0.name:
+            self.paper_exchange0.trade(self.quote_currency,\
+                self.base_currency, sell_fee.fee, 0)
+        else:
+            self.paper_exchange1.trade(self.quote_currency,\
+                self.base_currency, sell_fee.fee, 0)
+        return (buy_fee, sell_fee)
+
+    def refund_buy_fee(self, buy_fee):
+        """If transaction was not successful refund the fee."""
+        self.profit += buy_fee.fee
+        Fee.total_fees -= buy_fee.fee
+        if buy_fee.exchange.name == self.exchange0.name:
+            self.paper_exchange0.trade(self.base_currency,\
+              self.quote_currency, 0, buy_fee.fee)
+        else:
+            self.paper_exchange1.trade(self.base_currency,\
+              self.quote_currency, 0, buy_fee.fee)
+
+    def refund_sell_fee(self, sell_fee):
+        """If transaction was not successful refund the fee."""
+        self.profit += sell_fee.fee
+        Fee.total_fees -= sell_fee.fee
+        if sell_fee.exchange.name == self.exchange0.name:
+            self.paper_exchange0.trade(self.base_currency,\
+                self.quote_currency, 0, sell_fee.fee)
+        else:
+            self.paper_exchange1.trade(self.base_currency,\
+                self.quote_currency, 0, sell_fee.fee)
+
+    def place_paper_order(self, include_fees):
+        """This method uses combined order information to make paper
+        trades."""
         order = self.get_order()
+        if include_fees:
+            buy_fee, sell_fee = self.calculate_transaction_fees(order)
         self.profit += (order["sell"]["price"]\
             - order["buy"]["price"]) * order["buy"]["amount"]
         if order["sell"]["price"] - order["buy"]["price"] <= 0:
@@ -102,6 +152,8 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
                 self.quote_currency, order["sell"]["amount"],\
                 order["sell"]["amount"] * order["sell"]["price"])
         if not sell_succeeded:
+            self.refund_sell_fee(sell_fee)
+            self.refund_buy_fee(buy_fee)
             return False
         if order["buy"]["exchange"] == self.exchange0:
             buy_succeeded = self.paper_exchange0.trade(self.quote_currency,\
@@ -113,10 +165,48 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
                 self.base_currency,\
                 order["buy"]["amount"] * order["buy"]["price"],\
                 order["buy"]["amount"])
+        if not buy_succeeded:
+            self.refund_buy_fee(buy_fee)
 
         return buy_succeeded
 
-    def start_simulation(self, duration=2):
+    def time_money_making(self, amount, timeout=60, include_fees=False):
+        """Time how long it takes to make a certain amount of profit on two
+        particular exchanges with a particular currency pair."""
+        start_time = time.time()
+        starting_balances = [
+            self.paper_exchange0.wallet.copy(),
+            self.paper_exchange1.wallet.copy(),
+            ]
+        self.exchange0.load_markets()
+        self.exchange1.load_markets()
+        fail_count = 0
+        trade_count = 0
+        timeout *= 60
+        while self.profit < amount and time.time() - start_time < timeout:
+            try:
+                if not self.place_paper_order(include_fees):
+                    # paper order did not work so maybe stop trading
+                    print("Order failed")
+                    fail_count += 1
+                else:
+                    trade_count += 1
+                time.sleep(.5)
+# a bare except makes <C-c> not work.
+# To end early must exit or kill the process
+            except: # pylint: disable=bare-except
+                time.sleep(10)
+            if fail_count > 5:
+                break
+        duration = (time.time() - start_time) / 60
+        if self.profit < amount:
+            print("The simulation ended before achieving a profit of "\
+                    + amount)
+        print()
+        self.print_output(starting_balances, duration, trade_count)
+        self.reset_balances(starting_balances)
+
+    def start_simulation(self, duration=2, include_fees=False):
         """This method simulates arbitrage trading printing the output."""
         start_time = time.time()
         starting_balances = [
@@ -126,14 +216,19 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         self.exchange0.load_markets()
         self.exchange1.load_markets()
         fail_count = 0
+        trade_count = 0
         print("Beginning simulation...")
         while (time.time() - start_time) < duration * 60:
             try:
-                if not self.place_paper_order():
+                if not self.place_paper_order(include_fees):
                     # paper order did not work so maybe stop trading
                     print("Order failed")
                     fail_count += 1
+                else:
+                    trade_count += 1
                 time.sleep(.5)
+# a bare except makes <C-c> not work.
+# To end early must exit or kill the process
             except: # pylint: disable=bare-except
                 time.sleep(10)
             if fail_count > 5:
@@ -142,7 +237,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             + " minutes.")
         time.sleep(.5)
         print()
-        self.print_output(starting_balances, duration, True, True)
+        self.print_output(starting_balances, duration, trade_count)
         self.reset_balances(starting_balances)
 
     def reset_balances(self, starting_balances):
@@ -156,15 +251,21 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         self.paper_exchange1.deposit(self.quote_currency,\
             starting_balances[1][self.quote_currency])
 
-    def print_output(self, starting_balances, duration, change=False,\
-        totals=False):
+    def print_output(self, starting_balances, duration, trade_count):
         """This method prints out the results of the simulation."""
-        print("After running arbitrage for " + str(duration) + " on the "\
-            + self.exchange0.name + " and " + self.exchange1.name\
-            + " exchanges in the market for " + self.symbol\
-            + " the results were as follows:")
+        print("After running arbitrage for " + str(duration) + " minutes"\
+            + " on the " + self.exchange0.name + " and "\
+            + self.exchange1.name + " exchanges in the market for "\
+            + self.symbol + " the results were as follows:")
         print()
         print("Simple profit: " + str(self.profit))
+        print()
+        print("Simple profit without fees: "\
+                + str(self.profit + Fee.total_fees))
+        print()
+        print("Number of trades: " + str(trade_count))
+        print()
+        print("Total amount paid in fees: " + str(Fee.total_fees))
         print()
         d_base0 = self.paper_exchange0.wallet[self.base_currency]\
             - starting_balances[0][self.base_currency]
@@ -176,7 +277,8 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             - starting_balances[1][self.quote_currency]
         d_base = d_base0 + d_base1
         d_quote = d_quote0 + d_quote1
-        if change:
+        print_change = True
+        if print_change:
             print(" Change in amount of currencies:")
             print("   " + self.base_currency)
             print("     " + self.exchange0.name + ":" + str(d_base0))
@@ -187,10 +289,13 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             print("     " + self.exchange1.name + ":" + str(d_quote1))
             print("     Total:" + str(d_quote))
             print()
-        if totals:
+        print_totals = True
+        if print_totals:
             print("Starting Totals:")
-            print(self.exchange0.name + " " + json.dumps(starting_balances[0]))
-            print(self.exchange1.name + " " + json.dumps(starting_balances[1]))
+            print(self.exchange0.name + " "\
+                + json.dumps(starting_balances[0]))
+            print(self.exchange1.name + " "\
+                + json.dumps(starting_balances[1]))
             print("Ending Totals:")
             print(self.exchange0.name + " "\
                 + json.dumps(self.paper_exchange0.wallet))
@@ -204,15 +309,78 @@ if __name__ == "__main__":
         ArbitrageSimulation(ccxt.exmo(), ccxt.kraken(), "BTC/EUR"),
         ArbitrageSimulation(ccxt.bitfinex(), ccxt.exmo(), "ETH/USD"),
         ]
-    CHOICE = int(sys.argv[1]) if len(sys.argv) > 1 else 0
-    SIM = CHOICES[CHOICE]
-    if len(sys.argv) == 3:
-        SIM.start_simulation(int(sys.argv[2]))
-    elif len(sys.argv) > 3:
-        for arg in sys.argv[2:]:
-            SIM.start_simulation(int(arg))
-    else:
-        SIM.start_simulation(1)
-        SIM.start_simulation(2)
-        SIM.start_simulation(3)
-        SIM.start_simulation(5)
+    if len(sys.argv) > 1: # can provide commandline args to run simulation
+        # TODO: Make better user input with commandline args.
+        CHOICE = int(sys.argv[1]) # first argument is which default sim to use
+        USE_FEES = bool(sys.argv[2]) # second argument is using fees or not
+        SIM = CHOICES[CHOICE]
+        TYPE1 = [
+            "--duration",
+            "-d",
+            "--length",
+            "-l",
+            "-D",
+            "--durations",
+            ]
+        TYPE2 = [
+            "--amount",
+            "-a",
+            "-A",
+            "--amounts",
+            ]
+        if len(sys.argv) >= 5: # additional arguments are durations to run
+            if sys.argv[3] in TYPE1:
+                for arg in sys.argv[4:]:
+                    SIM.start_simulation(int(arg), include_fees=USE_FEES)
+            elif sys.argv[3] in TYPE2:
+                for arg in sys.argv[4:]:
+                    SIM.time_money_making(int(arg), include_fees=USE_FEES)
+        else: # if no duration provided run a series of durations
+            SIM.start_simulation(1)
+            SIM.start_simulation(2)
+            SIM.start_simulation(3)
+            SIM.start_simulation(5)
+    else: # if no command line arguments are given, prompt user
+        # TODO: Make better prompting and documentation to explain choices.
+        print("You provided no input arguments. What would you like to run?")
+        print("1) A simulation for a given duration")
+        print("2) A simulation until a certain profit is made")
+        SIMULATION_TYPE = input("Please enter the number of your choice: ")
+        while SIMULATION_TYPE != "1" and SIMULATION_TYPE != "2":
+            print("That was not a valid choice.")
+            SIMULATION_TYPE = input("Please enter the # of your choice: ")
+        print("Next choose which preset simulation."\
+                + "Feel free to add to this list.")
+        CHOICE = int(input("Please choose from 0 to " + str(len(CHOICES) - 1)\
+                + ": "))
+        while CHOICE < 0 or CHOICE >= len(CHOICES):
+            CHOICE = int(input("Please choose from 0 to " + str(len(CHOICES))\
+                    + ": "))
+        SIM = CHOICES[CHOICE]
+        print("Would you like to use the new (unvalidated) fees option?")
+        print("1) yes")
+        print("2) no")
+        USE_FEES = int(input("Please choose 1 or 2: "))
+        while USE_FEES != 1 and USE_FEES != 2:
+            USE_FEES = int(input("Please choose 1 or 2: "))
+        USE_FEES = True if USE_FEES == 1 else False
+        if SIMULATION_TYPE == "1":
+            print("Next choose a duration for simulation.")
+            TIME = float(input("Enter a number of minutes > zero: "))
+            while TIME < 0:
+                print("No negative times please.")
+                TIME = float(input("Enter a number of minutes > zero: "))
+            print("Done building simulation.")
+            print("Starting simulation. This may take a while...")
+            print("I use 'nohup' and '&' on linux to"\
+                    + " run the simulation in the background.")
+            SIM.start_simulation(TIME, include_fees=USE_FEES)
+        elif SIMULATION_TYPE == "2":
+            print("Next choose target amount.")
+            AMOUNT = float(input("Enter an amount of profit > zero: "))
+            while AMOUNT < 0:
+                print("No negative amounts please.")
+                AMOUNT = float(input("Enter an amount of profit > zero: "))
+            SIM.time_money_making(AMOUNT, include_fees=USE_FEES)
+        else:
+            print("This shouldn't happen. Simulation type is not working.")

@@ -1,4 +1,6 @@
 """This script could be used to simulate trades within exchanges."""
+
+
 class Exchange:
     """This class can be used to paper trade on a single exchange."""
     def __init__(self, newName):
@@ -6,6 +8,7 @@ class Exchange:
         the amount of currency held in each individual exchange."""
         self.name = newName
         self.wallet = {"USD": 0}
+
     def trade(self, from_currency, to_currency, amount_given, amount_recieved):
         """This function simulates a trade of one currency for another by a
         given amount. Example call that trades one bitcoin for $100 dollars:
@@ -26,6 +29,7 @@ class Exchange:
         print("Attempted: " + str(amount_given) + " Available: "\
             + str(self.wallet[from_currency]))
         return False
+
     def deposit(self, currency, amount):
         """This function allow for deposits into the wallet such that money can
         be added to the exchange arbitrarily without mere trades."""

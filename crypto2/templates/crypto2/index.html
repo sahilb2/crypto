@@ -10,7 +10,9 @@
 	<body>
 		<form action="results/" method="post">
 			{% csrf_token %}
-			{{ form }}
+			<table>
+				{{ form }}
+			</table>
   			<input type="submit" value="Submit" /> 
 		</form>
 	</body>

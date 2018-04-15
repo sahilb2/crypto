@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+	<title>
+	</title>
+	<head>
+		<h1>
+			Cryptocurrency Exchange Simulation
+		</h1>
+	</head>
+	<body>
+		<form action="results/" method="post">
+			{% csrf_token %}
+			<table>
+                {{ form }}
+            </table>
+  			<input type="submit" value="Submit" />
+		</form>
+	<p>Results Page</p>
+	</body>
+</html>

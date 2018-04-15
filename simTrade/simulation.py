@@ -4,8 +4,8 @@ import time
 import sys
 import json
 import ccxt
-from exchange import Exchange
-from fees import Fee
+from simTrade.exchange import Exchange
+from simTrade.fees import Fee
 
 class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
     """This class can be used to create simulations for arbitrage crypto

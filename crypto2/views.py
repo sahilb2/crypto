@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.template import loader
-from . import exchange
+from simTrade import exchange, simulation
 from .forms import SimulationForm
 
 def index(request):
@@ -12,7 +12,7 @@ def index(request):
 	context = {'form': form}
 	return render(request, "crypto2/index.html", context)
 
-def exchange_currency(request):
+def results(request):
 	if request.method == 'POST':
 		form = SimulationForm(request.POST)
 		if form.is_valid():

@@ -3,17 +3,27 @@
 	<title>
 	</title>
 	<head>
-		<h1>
-			Cryptocurrency Exchange Simulation
-		</h1>
+		<link href="https://stackpath.bootstrapcdn.com/bootswatch/4.1.0/solar/bootstrap.min.css"
+				  rel="stylesheet"
+				  integrity="sha384-Ac4ZYxfuTGU/klWhV1QAf06YAKz91+Q/13hUSYZ6jv9N371Jgh4K2rvTVgR0+fKW"
+				  crossorigin="anonymous">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	</head>
 	<body>
+	<h1>
+		Cryptocurrency Exchange Simulation
+	</h1>
+	<div class="container-fluid">
 		<form action="results/" method="post">
 			{% csrf_token %}
+			<div class="form-group">
 			<table>
 				{{ form }}
 			</table>
-  			<input type="submit" value="Submit" /> 
+			</div>
+  			<input type="submit" class="btn" value="Submit" />
 		</form>
+	</div>
 	</body>
 </html>

@@ -74,15 +74,21 @@ WSGI_APPLICATION = 'crypto.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
-
 # [START dbconfig]
 DATABASES = {
-	'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    'default': {
+        # If you are using Cloud SQL for MySQL rather than PostgreSQL, set
+        # 'ENGINE': 'django.db.backends.mysql' instead of the following.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'crypto2',
+        'USER': 'joowon',
+        'PASSWORD': 'max990322',
+        # For MySQL, set 'PORT': '3306' instead of the following. Any Cloud
+        # SQL Proxy instances running locally must also be set to tcp:3306.
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
-
 
 # In the flexible environment, you connect to CloudSQL using a unix socket.
 # Locally, you can use the CloudSQL proxy to proxy a localhost connection

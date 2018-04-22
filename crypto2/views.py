@@ -32,7 +32,7 @@ def print_http_response(f):
         sys.stdout = sys.__stdout__
         return HttpResponse(['<BR>' if c == '\n' else c for c in printed.content ])
     return new_f
-
+#
 @print_http_response
 def results(request):
 	output = ""

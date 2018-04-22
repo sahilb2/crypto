@@ -2,9 +2,3 @@
 Django==2.0.3
 ccxt
 psycopg2==2.7.4
-=======
-Django==1.4.2
-ccxt
-mysqlclient==1.3.12
-wheel==0.30.0
->>>>>>> parent of 2918e62... updated requirements.txt

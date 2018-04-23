@@ -72,7 +72,7 @@ WSGI_APPLICATION = 'crypto.wsgi.application'
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 
-DEBUG = config('DEBUG', default=False)
+DEBUG = config('DEBUG', default=False, cast=bool)
 DATABASES = {
     'default': dj_database_url.config(
         default=config('DATABASE_URL')
@@ -81,12 +81,14 @@ DATABASES = {
 # In the flexible environment, you connect to CloudSQL using a unix socket.
 # Locally, you can use the CloudSQL proxy to proxy a localhost connection
 # to the instance
+'''
 DATABASES['default']['HOST'] = '/cloudsql/cryptoproject-197619:us-central1:cryptodb'
 if os.getenv('GAE_INSTANCE'):
     pass
 else:
     DATABASES['default']['HOST'] = '127.0.0.1'
 # [END dbconfig]
+'''
 
 
 # Password validation

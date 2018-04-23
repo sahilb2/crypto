@@ -1,4 +1,7 @@
-<<<<<<< HEAD
-Django==2.0.3
-ccxt
-psycopg2==2.7.4
+
+ccxt==1.12.44
+Django==2.0.4
+gunicorn==19.7.1
+dj-database-url==0.3.0
+python-decouple==3
+whitenoise==3.2

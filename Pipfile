@@ -12,8 +12,6 @@ whitenoise = "==3.2"
 "psycopg2" = "==2.7.1"
 Django = "==2.0.4"
 django-heroku = "*"
-matplotlib = "*"
-tkinter = "*"
 
 [dev-packages]
 

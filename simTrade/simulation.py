@@ -138,15 +138,15 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         order = self.get_order()
         if include_fees:
             buy_fee, sell_fee = self.calculate_transaction_fees(order)
-        self.profit.append((order["sell"]["price"]\
-            - order["buy"]["price"]) * order["buy"]["amount"])
-        # print("Made trade for " + self.profit[len(self.profit)] + " profit")
         if order["sell"]["price"] - order["buy"]["price"] <= 0:
             # not a profitable order
             print("Sell at " + str(order["sell"]["price"]) + " Buy at "\
                 + str(order["buy"]["price"]))
             print("Skipping...")
             return True
+        # print("Made trade for " + self.profit[len(self.profit)] + " profit")
+        self.profit.append((order["sell"]["price"]\
+            - order["buy"]["price"]) * order["buy"]["amount"])
         # Not entirely sure how trading money works? My best guess.
         # But even if it's wrong the simulation will look like it's working.
         if order["sell"]["exchange"] == self.exchange0:
@@ -160,6 +160,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         if not sell_succeeded:
             self.refund_sell_fee(sell_fee)
             self.refund_buy_fee(buy_fee)
+            print("Sell failed")
             return False
         if order["buy"]["exchange"] == self.exchange0:
             buy_succeeded = self.paper_exchange0.trade(self.quote_currency,\
@@ -172,6 +173,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
                 order["buy"]["amount"] * order["buy"]["price"],\
                 order["buy"]["amount"])
         if not buy_succeeded:
+            print("Buy failed")
             self.refund_buy_fee(buy_fee)
 
         return buy_succeeded
@@ -189,6 +191,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         fail_count = 0
         trade_count = 0
         timeout *= 60
+        number_of_rebalances = 0
         while sum(self.profit) < amount and time.time() - start_time < timeout:
             try:
                 if not self.place_paper_order(include_fees):
@@ -198,6 +201,9 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
                 else:
                     trade_count += 1
                 time.sleep(.5)
+                if self.rebalance(starting_balances):
+# needed to rebalance so record that somewhere
+                    number_of_rebalances += 1
 # a bare except makes <C-c> not work.
 # To end early must exit or kill the process
             except: # pylint: disable=bare-except
@@ -209,7 +215,8 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             print("The simulation ended before achieving a profit of "\
                     + amount)
         print()
-        self.print_output(starting_balances, duration, trade_count)
+        self.print_output(starting_balances, duration, trade_count,\
+                number_of_rebalances)
         self.reset_balances(starting_balances)
 
     def start_simulation(self, duration=2, include_fees=False):
@@ -223,6 +230,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         self.exchange1.load_markets()
         fail_count = 0
         trade_count = 0
+        number_of_rebalances = 0
         print("Beginning simulation...")
         while (time.time() - start_time) < duration * 60:
             try:
@@ -232,6 +240,9 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
                     fail_count += 1
                 else:
                     trade_count += 1
+                if self.rebalance(starting_balances):
+# needed to rebalance so record that somewhere
+                    number_of_rebalances += 1
                 time.sleep(.5)
 # a bare except makes <C-c> not work.
 # To end early must exit or kill the process
@@ -243,7 +254,8 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             + " minutes.")
         time.sleep(.5)
         print()
-        self.print_output(starting_balances, duration, trade_count)
+        self.print_output(starting_balances, duration, trade_count,\
+                number_of_rebalances)
         self.reset_balances(starting_balances)
 
     def reset_balances(self, starting_balances):
@@ -257,7 +269,8 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         self.paper_exchange1.deposit(self.quote_currency,\
             starting_balances[1][self.quote_currency])
 
-    def print_output(self, starting_balances, duration, trade_count):
+    def print_output(self, starting_balances, duration, trade_count,\
+            number_of_rebalances):
         """This method prints out the results of the simulation."""
         print("After running arbitrage for " + str(duration) + " minutes"\
             + " on the " + self.exchange0.name + " and "\
@@ -272,6 +285,8 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         print("Number of trades: " + str(trade_count))
         print()
         print("Number of transactions: " + str(len(self.profit)))
+        print()
+        print("Number of rebalances: " + str(number_of_rebalances))
         print()
         print("Total amount paid in fees: " + str(Fee.total_fees))
         print()
@@ -329,6 +344,46 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         plt.xlabel("Time (number of trades since start)")
         plt.savefig("output_profit.png")
         plt.clf()
+
+    def rebalance(self, starting_balances, r_value=0.25):
+        """This method checks balances on exchanges and rebalances if
+        necessary."""
+# if the base or quote falls beneath a percentage of the starting balances
+# then move the complement of that percentage into the low exchange and out
+# of the high exchange
+        if self.paper_exchange0.wallet[self.base_currency]\
+                < r_value * starting_balances[0][self.base_currency]:
+            self.paper_exchange0.deposit(self.base_currency,\
+                    self.paper_exchange1.wallet[self.base_currency]\
+                    * (1 - r_value))
+            self.paper_exchange1.deposit(self.base_currency,\
+                    self.paper_exchange1.wallet[self.base_currency]\
+                    * -(1 - r_value))
+            self.paper_exchange1.deposit(self.quote_currency,\
+                    self.paper_exchange0.wallet[self.quote_currency]\
+                    * (1 - r_value))
+            self.paper_exchange0.deposit(self.quote_currency,\
+                    self.paper_exchange0.wallet[self.quote_currency]\
+                    * -(1 - r_value))
+            return True
+        if self.paper_exchange0.wallet[self.quote_currency]\
+                < r_value * starting_balances[0][self.quote_currency]:
+            self.paper_exchange0.deposit(self.base_currency,\
+                    self.paper_exchange1.wallet[self.base_currency]\
+                    * -(1 - r_value))
+            self.paper_exchange1.deposit(self.base_currency,\
+                    self.paper_exchange1.wallet[self.base_currency]\
+                    * (1 - r_value))
+            self.paper_exchange1.deposit(self.quote_currency,\
+                    self.paper_exchange0.wallet[self.quote_currency]\
+                    * -(1 - r_value))
+            self.paper_exchange0.deposit(self.quote_currency,\
+                    self.paper_exchange0.wallet[self.quote_currency]\
+                    * (1 - r_value))
+            return True
+        return False
+
+
 
 if __name__ == "__main__":
     CHOICES = [

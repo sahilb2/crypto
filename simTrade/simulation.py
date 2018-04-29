@@ -3,9 +3,13 @@
 import time
 import sys
 import json
+import argparse
 import ccxt
 from simTrade.exchange import Exchange
 from simTrade.fees import Fee
+import matplotlib.pyplot as plt
+# I need this with my work environment, it shouldn't be a problem
+plt.switch_backend("agg")
 
 class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
     """This class can be used to create simulations for arbitrage crypto
@@ -21,7 +25,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         self.paper_exchange1 = Exchange(exchange1.name)
         self.base_currency = symbol.split("/")[0]
         self.quote_currency = symbol.split("/")[1]
-        self.profit = 0
+        self.profit = []
         # Set initial balances in each market
         default_deposit_amount = 50
         default_quote_multiplier = 1e5
@@ -90,7 +94,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
 # currency.
         buy_fee, sell_fee = Fee.make_transaction_fees(order)
         fees = buy_fee.fee + sell_fee.fee
-        self.profit -= fees
+        self.profit.append(-fees)
         if buy_fee.exchange.name == self.exchange0.name:
             self.paper_exchange0.trade(self.quote_currency,\
               self.base_currency, buy_fee.fee, 0)
@@ -107,7 +111,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
 
     def refund_buy_fee(self, buy_fee):
         """If transaction was not successful refund the fee."""
-        self.profit += buy_fee.fee
+        self.profit.append(buy_fee.fee)
         Fee.total_fees -= buy_fee.fee
         if buy_fee.exchange.name == self.exchange0.name:
             self.paper_exchange0.trade(self.base_currency,\
@@ -118,7 +122,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
 
     def refund_sell_fee(self, sell_fee):
         """If transaction was not successful refund the fee."""
-        self.profit += sell_fee.fee
+        self.profit.append(sell_fee.fee)
         Fee.total_fees -= sell_fee.fee
         if sell_fee.exchange.name == self.exchange0.name:
             self.paper_exchange0.trade(self.base_currency,\
@@ -133,8 +137,9 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         order = self.get_order()
         if include_fees:
             buy_fee, sell_fee = self.calculate_transaction_fees(order)
-        self.profit += (order["sell"]["price"]\
-            - order["buy"]["price"]) * order["buy"]["amount"]
+        self.profit.append((order["sell"]["price"]\
+            - order["buy"]["price"]) * order["buy"]["amount"])
+        # print("Made trade for " + self.profit[len(self.profit)] + " profit")
         if order["sell"]["price"] - order["buy"]["price"] <= 0:
             # not a profitable order
             print("Sell at " + str(order["sell"]["price"]) + " Buy at "\
@@ -183,7 +188,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         fail_count = 0
         trade_count = 0
         timeout *= 60
-        while self.profit < amount and time.time() - start_time < timeout:
+        while sum(self.profit) < amount and time.time() - start_time < timeout:
             try:
                 if not self.place_paper_order(include_fees):
                     # paper order did not work so maybe stop trading
@@ -199,7 +204,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             if fail_count > 5:
                 break
         duration = (time.time() - start_time) / 60
-        if self.profit < amount:
+        if sum(self.profit) < amount:
             print("The simulation ended before achieving a profit of "\
                     + amount)
         print()
@@ -258,12 +263,14 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             + self.exchange1.name + " exchanges in the market for "\
             + self.symbol + " the results were as follows:")
         print()
-        print("Simple profit: " + str(self.profit))
+        print("Simple profit: " + str(sum(self.profit)))
         print()
         print("Simple profit without fees: "\
-                + str(self.profit + Fee.total_fees))
+                + str(sum(self.profit) + Fee.total_fees))
         print()
         print("Number of trades: " + str(trade_count))
+        print()
+        print("Number of transactions: " + str(len(self.profit)))
         print()
         print("Total amount paid in fees: " + str(Fee.total_fees))
         print()
@@ -302,6 +309,26 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
             print(self.exchange1.name + " "\
                 + json.dumps(self.paper_exchange1.wallet))
 
+    def create_trade_visuals(self):
+        """Create visualizations for the trading that occured."""
+        plt.hist(self.profit)
+        plt.suptitle("Histogram of profit per trade.")
+        plt.ylabel("Number of trades")
+        plt.xlabel("Profit on trade (" + self.quote_currency + ")")
+        plt.savefig("output_hist.png")
+        plt.clf()
+        profit_cumulative = []
+        profit_cumulative.append(self.profit[0])
+        for i in range(1, len(self.profit)):
+            profit_cumulative.append(self.profit[i]\
+                    + profit_cumulative[i - 1])
+        plt.plot(range(len(profit_cumulative)), profit_cumulative)
+        plt.suptitle("Cumulative Profit over Time")
+        plt.ylabel("Cumulative Profit (" + self.quote_currency + ")")
+        plt.xlabel("Time (number of trades since start)")
+        plt.savefig("output_profit.png")
+        plt.clf()
+
 if __name__ == "__main__":
     CHOICES = [
         ArbitrageSimulation(ccxt.bittrex(), ccxt.hitbtc(), "BTC/USDT"),
@@ -310,38 +337,36 @@ if __name__ == "__main__":
         ArbitrageSimulation(ccxt.bitfinex(), ccxt.exmo(), "ETH/USD"),
         ]
     if len(sys.argv) > 1: # can provide commandline args to run simulation
-        # TODO: Make better user input with commandline args.
-        CHOICE = int(sys.argv[1]) # first argument is which default sim to use
-        USE_FEES = bool(sys.argv[2]) # second argument is using fees or not
+        PARSER = argparse.ArgumentParser(description="Produces visual output"\
+                + " from simulator with the given parameters.")
+        PARSER.add_argument("simulation_type", help="whether to simulate a"\
+                + " duration (0) or for to time a profit (1).", type=int,\
+                choices=[0, 1])
+        PARSER.add_argument("limit_value",\
+                help="If duration, the time in minutes if timing a profit,"\
+                + " the amount of profit.", type=float)
+        PARSER.add_argument("simulation_choice",\
+                help="Which default simulation to use.", type=int,\
+                choices=range(len(CHOICES)))
+        PARSER.add_argument("-f", "--use_fees", help="flag to use for fees",\
+                action="store_true")
+        PARSER.add_argument("-v", "--visual_output", help="flag to create img",\
+                action="store_true")
+        ARGS = PARSER.parse_args()
+        CHOICE = ARGS.simulation_choice
+        USE_FEES = ARGS.use_fees
         SIM = CHOICES[CHOICE]
-        TYPE1 = [
-            "--duration",
-            "-d",
-            "--length",
-            "-l",
-            "-D",
-            "--durations",
-            ]
-        TYPE2 = [
-            "--amount",
-            "-a",
-            "-A",
-            "--amounts",
-            ]
-        if len(sys.argv) >= 5: # additional arguments are durations to run
-            if sys.argv[3] in TYPE1:
-                for arg in sys.argv[4:]:
-                    SIM.start_simulation(int(arg), include_fees=USE_FEES)
-            elif sys.argv[3] in TYPE2:
-                for arg in sys.argv[4:]:
-                    SIM.time_money_making(int(arg), include_fees=USE_FEES)
-        else: # if no duration provided run a series of durations
-            SIM.start_simulation(1)
-            SIM.start_simulation(2)
-            SIM.start_simulation(3)
-            SIM.start_simulation(5)
+        TYPE = ARGS.simulation_type
+        AMOUNT = ARGS.limit_value
+        VISUALS = ARGS.visual_output
+        if TYPE == 0:
+            SIM.start_simulation(AMOUNT, include_fees=USE_FEES)
+        elif TYPE == 1:
+            SIM.time_money_making(AMOUNT, include_fees=USE_FEES)
+        if VISUALS:
+            SIM.create_trade_visuals()
+
     else: # if no command line arguments are given, prompt user
-        # TODO: Make better prompting and documentation to explain choices.
         print("You provided no input arguments. What would you like to run?")
         print("1) A simulation for a given duration")
         print("2) A simulation until a certain profit is made")
@@ -357,7 +382,7 @@ if __name__ == "__main__":
             CHOICE = int(input("Please choose from 0 to " + str(len(CHOICES))\
                     + ": "))
         SIM = CHOICES[CHOICE]
-        print("Would you like to use the new (unvalidated) fees option?")
+        print("Would you like to use the new fees option?")
         print("1) yes")
         print("2) no")
         USE_FEES = int(input("Please choose 1 or 2: "))
@@ -371,9 +396,8 @@ if __name__ == "__main__":
                 print("No negative times please.")
                 TIME = float(input("Enter a number of minutes > zero: "))
             print("Done building simulation.")
-            print("Starting simulation. This may take a while...")
-            print("I use 'nohup' and '&' on linux to"\
-                    + " run the simulation in the background.")
+            # print("I use 'nohup' and '&' on linux to"\
+            #        + " run the simulation in the background.")
             SIM.start_simulation(TIME, include_fees=USE_FEES)
         elif SIMULATION_TYPE == "2":
             print("Next choose target amount.")
@@ -384,3 +408,10 @@ if __name__ == "__main__":
             SIM.time_money_making(AMOUNT, include_fees=USE_FEES)
         else:
             print("This shouldn't happen. Simulation type is not working.")
+        print("Would you like to make some visuals of the trades?")
+        VISUALS = int(input("1 for visuals, 0 for no visuals: "))
+        if VISUALS == 1:
+            SIM.create_trade_visuals()
+            print("Your visuals can be found in the output images.")
+        else:
+            print("Done")

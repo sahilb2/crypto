@@ -11,19 +11,47 @@
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	</head>
 	<body>
-	<h1>
-		Cryptocurrency Exchange Simulation
-	</h1>
-	<div class="container-fluid">
-		<form action="results/" method="post">
-			{% csrf_token %}
-			<div class="form-group">
-			<table>
-				{{ form }}
-			</table>
+		<h1>
+			Cryptocurrency Exchange Simulation
+		</h1>
+		<div class="container-fluid">
+			<form action="results/" method="post">
+				{% csrf_token %}
+				<div class="form-group">
+				<table>
+					{{ form }}
+				</table>
+				</div>
+				<input onclick="move()" type="submit" class="btn" value="Submit" />
+			</form>
+		</div>
+		<div class="progress">
+			<div id="dynamic" class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+			<span id="current-progress"></span>
 			</div>
-  			<input type="submit" class="btn" value="Submit" />
-		</form>
-	</div>
+		</div>
+			<style>
+				.progress {
+				 margin: 10px;
+				  width: 700px;
+				}
+			</style>
+			<script>
+				function move() {
+					$(function() {
+						var duration = Number(document.getElementById("id_duration").value);
+						var current_progress = 0;
+						var interval = setInterval(function() {
+							current_progress += 100 / (duration * 60);
+							$("#dynamic")
+							.css("width", current_progress + "%")
+							.attr("aria-valuenow", current_progress)
+							.text(current_progress + "% Complete");
+							if (current_progress >= 100)
+								clearInterval(interval);
+						}, 1000);
+					});
+			 	}
+			</script>
 	</body>
 </html>

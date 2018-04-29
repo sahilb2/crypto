@@ -35,9 +35,9 @@ def results(request):
 				if s is not "":
 					result_string.append(s)
 			output = result_string
-			'''
+
 			sim.create_trade_visuals()
-			'''
+
 			context = {'form': form,
 					   'currency': currency,
 					   'duration': duration,

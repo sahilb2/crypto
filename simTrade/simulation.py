@@ -7,9 +7,13 @@ import argparse
 import ccxt
 from simTrade.exchange import Exchange
 from simTrade.fees import Fee
+'''
 import matplotlib.pyplot as plt
+'''
 # I need this with my work environment, it shouldn't be a problem
+'''
 plt.switch_backend("agg")
+'''
 
 class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
     """This class can be used to create simulations for arbitrage crypto
@@ -308,7 +312,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
                 + json.dumps(self.paper_exchange0.wallet))
             print(self.exchange1.name + " "\
                 + json.dumps(self.paper_exchange1.wallet))
-
+'''
     def create_trade_visuals(self):
         """Create visualizations for the trading that occured."""
         plt.hist(self.profit)
@@ -328,6 +332,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         plt.xlabel("Time (number of trades since start)")
         plt.savefig("crypto/static/graphs/output_profit.png")
         plt.clf()
+'''
 
 if __name__ == "__main__":
     CHOICES = [

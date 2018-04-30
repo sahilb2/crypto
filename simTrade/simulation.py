@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 
 # I need this with my work environment, it shouldn't be a problem
 
-plt.switch_backend("agg")
+plt.switch_backend("Agg")
+
 
 
 class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes

@@ -7,9 +7,9 @@ import argparse
 import ccxt
 from simTrade.exchange import Exchange
 from simTrade.fees import Fee
-import matplotlib
-import matplotlib.pyplot as plt
-matplotlib.use('agg')
+import matplotlib as plt
+#import matplotlib.pyplot as plt
+plt.use('Agg')
 # I need this with my work environment, it shouldn't be a problem
 
 # plt.switch_backend("Agg")

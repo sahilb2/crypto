@@ -13,8 +13,8 @@ whitenoise = "==3.2"
 Django = "==2.0.4"
 django-heroku = "*"
 matplotlib = "*"
-
-
+matplotlib.pyplot = "*"
+Tkinter = "*"
 
 [dev-packages]
 

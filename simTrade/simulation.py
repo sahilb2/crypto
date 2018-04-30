@@ -16,7 +16,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
     trading.
     TODO: example usage
     """
-    def __init__(self, exchange0, exchange1, symbol):
+    def __init__(self, exchange0, exchange1, amount, symbol):
         """ This initializes a simulation with given arguments."""
         self.exchange0 = exchange0
         self.exchange1 = exchange1
@@ -30,13 +30,13 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         default_deposit_amount = 50
         default_quote_multiplier = 1e5
         self.paper_exchange0.deposit(self.base_currency,\
-            default_deposit_amount)
+            amount)
         self.paper_exchange1.deposit(self.base_currency,\
-            default_deposit_amount)
+            amount)
         self.paper_exchange0.deposit(self.quote_currency,\
-            default_deposit_amount * default_quote_multiplier)
+            amount * default_quote_multiplier)
         self.paper_exchange1.deposit(self.quote_currency,\
-            default_deposit_amount * default_quote_multiplier)
+            amount * default_quote_multiplier)
 
     def get_to_buy(self):
         """This method querries the exchanges to find the lowest asking price
@@ -315,7 +315,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         plt.suptitle("Histogram of profit per trade.")
         plt.ylabel("Number of trades")
         plt.xlabel("Profit on trade (" + self.quote_currency + ")")
-        plt.savefig("output_hist.png")
+        plt.savefig("crypto/static/graphs/output_hist.png")
         plt.clf()
         profit_cumulative = []
         profit_cumulative.append(self.profit[0])
@@ -326,7 +326,7 @@ class ArbitrageSimulation: # pylint: disable=too-many-instance-attributes
         plt.suptitle("Cumulative Profit over Time")
         plt.ylabel("Cumulative Profit (" + self.quote_currency + ")")
         plt.xlabel("Time (number of trades since start)")
-        plt.savefig("output_profit.png")
+        plt.savefig("crypto/static/graphs/output_profit.png")
         plt.clf()
 
 if __name__ == "__main__":

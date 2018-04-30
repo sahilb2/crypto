@@ -9,11 +9,36 @@
 				  crossorigin="anonymous">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<style>
+			.progress {
+				 margin: 10px;
+				 width: 700px;
+			}
+		</style>
 	</head>
 	<body>
+		<div class="container">
+			<script type="text/javascript">
+				baseUrl = "https://widgets.cryptocompare.com/";
+				var scripts = document.getElementsByTagName("script");
+				var embedder = scripts[ scripts.length - 1 ];
+				var cccTheme = {"General":{"background":"#000","priceText":"#fff"},"Currency":{"color":"#fff"}};
+				(function (){
+				var appName = encodeURIComponent(window.location.hostname);
+				if(appName==""){appName="local";}
+				var s = document.createElement("script");
+				s.type = "text/javascript";
+				s.async = true;
+				var theUrl = baseUrl+'serve/v3/coin/header?fsyms=BTC,ETH,XMR,LTC,DOGE&tsyms=USD';
+				s.src = theUrl + ( theUrl.indexOf("?") >= 0 ? "&" : "?") + "app=" + appName;
+				embedder.parentNode.appendChild(s);
+				})();
+			</script>
+		</div>
 		<h1>
 			Cryptocurrency Exchange Simulation
 		</h1>
+		<br><br>
 		<div class="container-fluid">
 			<form action="results/" method="post">
 				{% csrf_token %}
@@ -25,17 +50,11 @@
 				<input onclick="move()" type="submit" class="btn" value="Submit" />
 			</form>
 		</div>
+		<br>
 		<div class="progress">
 			<div id="dynamic" class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
 			<span id="current-progress"></span>
 			</div>
-		</div>
-			<style>
-				.progress {
-				 margin: 10px;
-				  width: 700px;
-				}
-			</style>
 			<script>
 				function move() {
 					$(function() {
@@ -46,12 +65,12 @@
 							$("#dynamic")
 							.css("width", current_progress + "%")
 							.attr("aria-valuenow", current_progress)
-							.text(current_progress + "% Complete");
 							if (current_progress >= 100)
 								clearInterval(interval);
 						}, 1000);
 					});
 			 	}
 			</script>
+		</div>
 	</body>
 </html>

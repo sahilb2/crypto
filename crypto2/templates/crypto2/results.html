@@ -9,16 +9,27 @@
 				  crossorigin="anonymous">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<style>
+			.container {
+				float: right;
+			}
+		</style>
 	</head>
 	<body>
+		<div class="container" align="right">
+			{% load static %}
+			<img src="{% static "graphs/output_hist.png" %}" alt="Histogram"/><br>
+			<img src="{% static "graphs/output_profit.png" %}" alt="Profit">
+		</div>
 		<h1>
 			Cryptocurrency Exchange Simulation
 		</h1>
 		{% for string in output %}
 		<p>{{ string }}<br></p>
 		{% endfor %}
-		<img src="file:/crypto/simTrade/output_hist.png" alt="Histogram">
-		<img src="/simTrade/output_profit.png" alt="Profit">
+		<form action="../">
+			<input align="center" type="submit" class="btn" value="Run Another Simulation" />
+		</form>
 	</body>
 </html>
 

@@ -21,13 +21,16 @@ def results(request):
 		form = SimulationForm(request.POST)
 		if form.is_valid():
 			amount = form.cleaned_data['amount']
-			currency = form.cleaned_data['currency']
+			base_currency = form.cleaned_data['base_currency']
+			quote_currency = form.cleaned_data['quote_currency']
 			duration = form.cleaned_data['duration']
-			sim = simulation.ArbitrageSimulation(ccxt.exmo(), ccxt.gdax(), "BTC/USD")
+			use_fees = form.cleaned_data['include_fees']
+			sim = simulation.ArbitrageSimulation(ccxt.exmo(), ccxt.gdax(), amount, base_currency + "/" + quote_currency)
 			old_stdout = sys.stdout
 			result = StringIO()
 			sys.stdout = result
-			sim.start_simulation(duration)
+			sim.start_simulation(duration, include_fees=use_fees)
+			sim.create_trade_visuals()
 			sys.stdout = old_stdout
 			result_list = result.getvalue().split("\n")
 			result_string = []
@@ -35,9 +38,7 @@ def results(request):
 				if s is not "":
 					result_string.append(s)
 			output = result_string
-			sim.create_trade_visuals()
 			context = {'form': form,
-					   'currency': currency,
 					   'duration': duration,
 					   'amount': amount,
 					   'output': output}
